@@ -282,12 +282,35 @@ for field in get_fields(cls):
 2. Update any field iteration patterns
 
 ### Verification Criteria for Phase 3:
-- [ ] All existing tests pass
-- [ ] Schema generation produces identical output
-- [ ] Field defaults work correctly
-- [ ] Field metadata preserved
-- [ ] `@strawberry.field` decorator works as before
-- [ ] Resolver argument handling unchanged
+- [x] All existing tests pass
+- [x] Schema generation produces identical output
+- [x] Field defaults work correctly
+- [x] Field metadata preserved
+- [x] `@strawberry.field` decorator works as before
+- [x] Resolver argument handling unchanged
+
+**Phase 3 Status: COMPLETE** (2026-01-05)
+
+**Key Implementation Details:**
+
+1. **StrawberryField Migration:**
+   - Removed inheritance from `dataclasses.Field`
+   - Added `__slots__` for memory efficiency (with `__dict__` for `cached_property` support)
+   - Uses `MISSING` sentinel from compat module instead of `dataclasses.MISSING`
+
+2. **Dataclass Integration:**
+   - `_check_field_annotations()` now converts `StrawberryField` to `dataclasses.field()` before the dataclass decorator runs
+   - Original `StrawberryField` instances stored in `cls.__strawberry_fields__` dict for later retrieval
+   - This preserves dataclass behavior (defaults, init, repr) while keeping `StrawberryField` metadata
+
+3. **Type Resolver Updates:**
+   - `_get_fields()` looks up `StrawberryField` from `__strawberry_fields__` dict
+   - Falls back to class `__dict__` lookup for inherited fields
+   - Sets `type_annotation` from dataclass field type if not already set
+
+4. **Schema Converter Updates:**
+   - Replaced `dataclasses.MISSING` checks with `is_missing()` from compat module
+   - Ensures proper handling of missing default values in input types
 
 ---
 

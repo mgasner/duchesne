@@ -47,11 +47,13 @@ def _check_field_annotations(cls: builtins.type[Any]) -> None:
 
     https://github.com/python/cpython/blob/6fed3c85402c5ca704eb3f3189ca3f5c67a08d19/Lib/dataclasses.py#L881-L884
     """
+    from strawberry.compat import MISSING, is_missing
+
     cls_annotations = get_annotations(cls)
     # TODO: do we need this?
     cls.__annotations__ = cls_annotations
 
-    for field_name, field_ in cls.__dict__.items():
+    for field_name, field_ in list(cls.__dict__.items()):
         if not isinstance(field_, (StrawberryField, dataclasses.Field)):
             # Not a dataclasses.Field, nor a StrawberryField. Ignore
             continue
@@ -64,7 +66,6 @@ def _check_field_annotations(cls: builtins.type[Any]) -> None:
             if field_.type_annotation is not None:
                 if field_name not in cls_annotations:
                     cls_annotations[field_name] = field_.type_annotation.annotation
-                continue
 
             # Make sure the cls has an annotation
             if field_name not in cls_annotations:
@@ -82,12 +83,49 @@ def _check_field_annotations(cls: builtins.type[Any]) -> None:
                     )
 
                 if field_name not in cls_annotations:
-                    cls_annotations[field_name] = field_.base_resolver.type_annotation
+                    cls_annotations[field_name] = field_.base_resolver.type_annotation.annotation
 
             # TODO: Make sure the cls annotation agrees with the field's type
             # >>> if cls_annotations[field_name] != field.base_resolver.type:
             # >>>     # TODO: Proper error
             # >>>    raise Exception
+
+            # Convert StrawberryField to dataclasses.field() so the dataclass
+            # decorator can properly handle defaults
+            if not is_missing(field_.default_factory) and callable(field_.default_factory):
+                dc_field = dataclasses.field(
+                    default_factory=field_.default_factory,
+                    init=field_.init,
+                    repr=field_.repr,
+                    compare=field_.compare,
+                    hash=field_.hash,
+                    metadata=dict(field_.metadata) if field_.metadata else {},
+                    kw_only=field_.kw_only,
+                )
+            elif not is_missing(field_.default):
+                dc_field = dataclasses.field(
+                    default=field_.default,
+                    init=field_.init,
+                    repr=field_.repr,
+                    compare=field_.compare,
+                    hash=field_.hash,
+                    metadata=dict(field_.metadata) if field_.metadata else {},
+                    kw_only=field_.kw_only,
+                )
+            else:
+                dc_field = dataclasses.field(
+                    init=field_.init,
+                    repr=field_.repr,
+                    compare=field_.compare,
+                    hash=field_.hash,
+                    metadata=dict(field_.metadata) if field_.metadata else {},
+                    kw_only=field_.kw_only,
+                )
+            # Store the original StrawberryField in a class-level dict for later retrieval
+            if not hasattr(cls, "__strawberry_fields__"):
+                cls.__strawberry_fields__ = {}
+            cls.__strawberry_fields__[field_name] = field_
+            setattr(cls, field_name, dc_field)
 
         # If somehow a non-StrawberryField field is added to the cls without annotations
         # it raises an exception. This would occur if someone manually uses
