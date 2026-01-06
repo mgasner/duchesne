@@ -1,42 +1,39 @@
-import dataclasses
 from collections.abc import Callable, Iterable, Mapping
 from enum import EnumMeta
 from typing import TYPE_CHECKING, Any, TypeGuard, TypeVar, overload
 
+import msgspec
+
 from strawberry.exceptions import ObjectIsNotAnEnumError
 from strawberry.types.base import (
-    StrawberryType,
+    StrawberryTypeMixin,
     WithStrawberryDefinition,
     has_strawberry_definition,
 )
 from strawberry.utils.deprecations import DEPRECATION_MESSAGES, DeprecatedDescriptor
 
 
-@dataclasses.dataclass
-class EnumValue:
+class EnumValue(msgspec.Struct):
     name: str
     value: Any
     deprecation_reason: str | None = None
-    directives: Iterable[object] = ()
+    directives: tuple[object, ...] = ()
     description: str | None = None
 
 
-@dataclasses.dataclass
-class StrawberryEnumDefinition(StrawberryType):
+class StrawberryEnumDefinition(msgspec.Struct, StrawberryTypeMixin):
     wrapped_cls: EnumMeta
     name: str
     values: list[EnumValue]
     description: str | None
-    directives: Iterable[object] = ()
+    directives: tuple[object, ...] = ()
 
     def __hash__(self) -> int:
-        # TODO: Is this enough for unique-ness?
         return hash(self.name)
 
     def copy_with(
-        self, type_var_map: Mapping[str, StrawberryType | type]
-    ) -> StrawberryType | type:
-        # enum don't support type parameters, so we can safely return self
+        self, type_var_map: Mapping[str, StrawberryTypeMixin | type]
+    ) -> StrawberryTypeMixin | type:
         return self
 
     @property
@@ -49,12 +46,11 @@ class StrawberryEnumDefinition(StrawberryType):
 
 
 # TODO: remove duplication of EnumValueDefinition and EnumValue
-@dataclasses.dataclass
-class EnumValueDefinition:
+class EnumValueDefinition(msgspec.Struct):
     value: Any
     graphql_name: str | None = None
     deprecation_reason: str | None = None
-    directives: Iterable[object] = ()
+    directives: tuple[object, ...] = ()
     description: str | None = None
 
     def __int__(self) -> int:
@@ -144,7 +140,7 @@ def _process_enum(
             item_name,
             item_value,
             deprecation_reason=deprecation_reason,
-            directives=item_directives,
+            directives=tuple(item_directives),
             description=enum_value_description,
         )
         values.append(value)
@@ -154,7 +150,7 @@ def _process_enum(
         name=name,
         values=values,
         description=description,
-        directives=directives,
+        directives=tuple(directives),
     )
 
     # TODO: remove when deprecating _enum_definition

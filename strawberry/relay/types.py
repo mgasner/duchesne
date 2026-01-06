@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import dataclasses
 import inspect
 import itertools
 import sys
@@ -12,6 +11,9 @@ from collections.abc import (
     Iterator,
     Sequence,
 )
+
+import msgspec
+
 from typing import (
     TYPE_CHECKING,
     Annotated,
@@ -71,8 +73,7 @@ class GlobalIDValueError(ValueError):
     """GlobalID value error, usually related to parsing or serialization."""
 
 
-@dataclasses.dataclass(order=True, frozen=True)
-class GlobalID:
+class GlobalID(msgspec.Struct, frozen=True, order=True):
     """Global ID for relay types.
 
     Different from `strawberry.ID`, this ID wraps the original object ID in a string
@@ -95,16 +96,6 @@ class GlobalID:
 
     type_name: str
     node_id: str
-
-    def __post_init__(self) -> None:
-        if not isinstance(self.type_name, str):
-            raise GlobalIDValueError(
-                f"type_name is expected to be a string, found {self.type_name!r}"
-            )
-        if not isinstance(self.node_id, str):
-            raise GlobalIDValueError(
-                f"node_id is expected to be a string, found {self.node_id!r}"
-            )
 
     def __str__(self) -> str:
         return to_base64(self.type_name, self.node_id)

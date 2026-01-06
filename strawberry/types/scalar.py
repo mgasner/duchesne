@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import sys
-from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -11,8 +10,10 @@ from typing import (
     overload,
 )
 
+import msgspec
+
 from strawberry.exceptions import InvalidUnionTypeError
-from strawberry.types.base import StrawberryType
+from strawberry.types.base import StrawberryTypeMixin
 from strawberry.utils.str_converters import to_camel_case
 
 if TYPE_CHECKING:
@@ -28,29 +29,23 @@ def identity(x: _T) -> _T:
     return x
 
 
-@dataclass
-class ScalarDefinition(StrawberryType):
+class ScalarDefinition(msgspec.Struct, StrawberryTypeMixin):
     name: str
     description: str | None
     specified_by_url: str | None
     serialize: Callable | None
     parse_value: Callable | None
     parse_literal: Callable | None
-    directives: Iterable[object] = ()
+    directives: tuple[object, ...] = ()
     origin: GraphQLScalarType | type | None = None
-
-    # Optionally store the GraphQLScalarType instance so that we don't get
-    # duplicates
     implementation: GraphQLScalarType | None = None
-
-    # used for better error messages
     _source_file: str | None = None
     _source_line: int | None = None
 
     def copy_with(
-        self, type_var_map: Mapping[str, StrawberryType | type]
-    ) -> StrawberryType | type:
-        return super().copy_with(type_var_map)  # type: ignore[safe-super]
+        self, type_var_map: Mapping[str, StrawberryTypeMixin | type]
+    ) -> StrawberryTypeMixin | type:
+        return self
 
     @property
     def is_graphql_generic(self) -> bool:
@@ -109,7 +104,7 @@ def _process_scalar(
         serialize=serialize,
         parse_literal=parse_literal,
         parse_value=parse_value,
-        directives=directives,
+        directives=tuple(directives),
         origin=cls,  # type: ignore[arg-type]
         _source_file=_source_file,
         _source_line=_source_line,

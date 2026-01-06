@@ -11,6 +11,7 @@ from typing import (
     TypeGuard,
     TypeVar,
     overload,
+    runtime_checkable,
 )
 from typing_extensions import Protocol, Self, deprecated
 
@@ -25,6 +26,69 @@ if TYPE_CHECKING:
     from graphql import GraphQLAbstractType, GraphQLResolveInfo
 
     from strawberry.types.field import StrawberryField
+
+
+@runtime_checkable
+class StrawberryTypeProtocol(Protocol):
+    """Protocol defining the interface for Strawberry types.
+    
+    This protocol enables structural subtyping, allowing msgspec Structs
+    to satisfy the StrawberryType interface without inheritance.
+    """
+
+    @property
+    def type_params(self) -> list[TypeVar]: ...
+
+    @property
+    def is_one_of(self) -> bool: ...
+
+    @property
+    def is_graphql_generic(self) -> bool: ...
+
+    def copy_with(
+        self,
+        type_var_map: Mapping[
+            str, StrawberryTypeProtocol | type
+        ],
+    ) -> StrawberryTypeProtocol | type: ...
+
+    def has_generic(self, type_var: TypeVar) -> bool: ...
+
+
+class StrawberryTypeMixin:
+    """Mixin providing default StrawberryType implementations for msgspec Structs.
+    
+    Use this mixin with msgspec.Struct classes that need to implement
+    the StrawberryType interface.
+    """
+
+    @property
+    def type_params(self) -> list[TypeVar]:
+        return []
+
+    @property
+    def is_one_of(self) -> bool:
+        return False
+
+    def has_generic(self, type_var: TypeVar) -> bool:
+        return False
+
+    def __eq__(self, other: object) -> bool:
+        from strawberry.annotation import StrawberryAnnotation
+
+        if isinstance(other, (StrawberryType, StrawberryTypeMixin)):
+            return self is other
+
+        if isinstance(other, StrawberryAnnotation):
+            return self == other.resolve()
+
+        resolved = StrawberryAnnotation(other).resolve()
+        if isinstance(resolved, (StrawberryType, StrawberryTypeMixin)):
+            return self == resolved
+        return NotImplemented
+
+    def __hash__(self) -> int:
+        return id(self)
 
 
 class StrawberryType(ABC):

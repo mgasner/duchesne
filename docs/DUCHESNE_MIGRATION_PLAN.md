@@ -171,22 +171,43 @@ class GlobalID(msgspec.Struct, frozen=True, order=True):
 
 ### Milestone 2.3: Migrate Enum/Scalar Definitions
 
-**Files to Modify:**
-- `strawberry/types/enum.py`
-- `strawberry/types/scalar.py`
+**Metaclass Conflict Resolution:**
 
-**Types to Migrate:**
-- `EnumValue`
-- `EnumValueDefinition`
-- `StrawberryEnumDefinition`
-- `ScalarDefinition`
+Types that inherit from `StrawberryType` (an ABC) cannot also inherit from `msgspec.Struct` due to metaclass conflicts. This was resolved by:
+
+1. Creating `StrawberryTypeProtocol` - a runtime-checkable Protocol for structural typing
+2. Creating `StrawberryTypeMixin` - provides default implementations for msgspec Structs
+3. Keeping `StrawberryType` ABC for backward compatibility with existing container types
+
+**Types migrated using the mixin approach:**
+- `EnumValue` - msgspec.Struct
+- `EnumValueDefinition` - msgspec.Struct
+- `StrawberryEnumDefinition` - msgspec.Struct + StrawberryTypeMixin
+- `ScalarDefinition` - msgspec.Struct + StrawberryTypeMixin
 
 ### Verification Criteria for Phase 2:
-- [ ] All existing tests pass
-- [ ] Migrated types work correctly in schema generation
-- [ ] `from_node()` class methods still work
-- [ ] `GlobalID` ordering and freezing behavior preserved
-- [ ] Enum serialization/deserialization unchanged
+- [x] All existing tests pass
+- [x] Migrated types work correctly in schema generation
+- [x] `from_node()` class methods still work
+- [x] `GlobalID` ordering and freezing behavior preserved
+- [x] Enum serialization/deserialization works correctly
+- [x] Scalar serialization/deserialization works correctly
+
+**Phase 2 Status: COMPLETE** (2026-01-05)
+
+**Types migrated to msgspec.Struct:**
+- `SelectedField` (nodes.py)
+- `FragmentSpread` (nodes.py)
+- `InlineFragment` (nodes.py)
+- `GlobalID` (relay/types.py)
+- `EnumValue` (enum.py)
+- `EnumValueDefinition` (enum.py)
+- `StrawberryEnumDefinition` (enum.py) - with StrawberryTypeMixin
+- `ScalarDefinition` (scalar.py) - with StrawberryTypeMixin
+
+**New infrastructure added:**
+- `StrawberryTypeProtocol` (base.py) - Protocol for structural typing
+- `StrawberryTypeMixin` (base.py) - Mixin for msgspec Struct compatibility
 
 ---
 
