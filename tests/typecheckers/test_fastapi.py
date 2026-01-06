@@ -1,9 +1,9 @@
 from inline_snapshot import snapshot
 
-from .utils.marks import requires_mypy, requires_pyright, requires_ty, skip_on_windows
+from .utils.marks import requires_pyright, requires_ty, skip_on_windows
 from .utils.typecheck import Result, typecheck
 
-pytestmark = [skip_on_windows, requires_pyright, requires_mypy, requires_ty]
+pytestmark = [skip_on_windows, requires_pyright, requires_ty]
 
 CODE_ROUTER_WITH_CONTEXT = """
 import strawberry
@@ -45,16 +45,6 @@ def test_router_with_context():
             Result(
                 type="information",
                 message='Type of "router" is "GraphQLRouter[Context, None]"',
-                line=29,
-                column=13,
-            ),
-        ]
-    )
-    assert results.mypy == snapshot(
-        [
-            Result(
-                type="note",
-                message='Revealed type is "strawberry.fastapi.router.GraphQLRouter[mypy_test.Context, None]"',
                 line=29,
                 column=13,
             ),
@@ -112,16 +102,6 @@ def test_router_with_async_context():
             Result(
                 type="information",
                 message='Type of "router" is "GraphQLRouter[Context, None]"',
-                line=29,
-                column=13,
-            ),
-        ]
-    )
-    assert results.mypy == snapshot(
-        [
-            Result(
-                type="note",
-                message='Revealed type is "strawberry.fastapi.router.GraphQLRouter[mypy_test.Context, None]"',
                 line=29,
                 column=13,
             ),

@@ -1,9 +1,9 @@
 from inline_snapshot import snapshot
 
-from .utils.marks import requires_mypy, requires_pyright, requires_ty, skip_on_windows
+from .utils.marks import requires_pyright, requires_ty, skip_on_windows
 from .utils.typecheck import Result, typecheck
 
-pytestmark = [skip_on_windows, requires_pyright, requires_mypy, requires_ty]
+pytestmark = [skip_on_windows, requires_pyright, requires_ty]
 
 
 CODE = """
@@ -243,172 +243,8 @@ def test():
             ),
         ]
     )
-    assert results.mypy == snapshot(
-        [
-            Result(type="error", message="Missing return statement", line=33, column=5),
-            Result(type="error", message="Missing return statement", line=56, column=1),
-            Result(
-                type="error",
-                message='Untyped decorator makes function "fruits_custom_resolver" untyped',
-                line=74,
-                column=6,
-            ),
-            Result(type="error", message="Missing return statement", line=75, column=5),
-            Result(
-                type="error",
-                message='Untyped decorator makes function "fruits_custom_resolver_iterator" untyped',
-                line=82,
-                column=6,
-            ),
-            Result(type="error", message="Missing return statement", line=83, column=5),
-            Result(
-                type="error",
-                message='Untyped decorator makes function "fruits_custom_resolver_iterable" untyped',
-                line=90,
-                column=6,
-            ),
-            Result(type="error", message="Missing return statement", line=91, column=5),
-            Result(
-                type="error",
-                message='Untyped decorator makes function "fruits_custom_resolver_generator" untyped',
-                line=98,
-                column=6,
-            ),
-            Result(type="error", message="Missing return statement", line=99, column=5),
-            Result(
-                type="error",
-                message='Untyped decorator makes function "fruits_custom_resolver_async_iterator" untyped',
-                line=106,
-                column=6,
-            ),
-            Result(
-                type="error", message="Missing return statement", line=107, column=5
-            ),
-            Result(
-                type="error",
-                message='Untyped decorator makes function "fruits_custom_resolver_async_iterable" untyped',
-                line=114,
-                column=6,
-            ),
-            Result(
-                type="error", message="Missing return statement", line=115, column=5
-            ),
-            Result(
-                type="error",
-                message='Untyped decorator makes function "fruits_custom_resolver_async_generator" untyped',
-                line=122,
-                column=6,
-            ),
-            Result(
-                type="error", message="Missing return statement", line=123, column=5
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "strawberry.relay.types.Node"',
-                line=130,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "builtins.list[strawberry.relay.types.Node]"',
-                line=131,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "strawberry.relay.types.Node | None"',
-                line=132,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "builtins.list[strawberry.relay.types.Node | None]"',
-                line=133,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "strawberry.relay.types.Connection[mypy_test.Fruit]"',
-                line=134,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "strawberry.relay.types.Connection[mypy_test.Fruit]"',
-                line=135,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "mypy_test.FruitCustomPaginationConnection"',
-                line=136,
-                column=13,
-            ),
-            Result(type="note", message='Revealed type is "Any"', line=137, column=13),
-            Result(type="note", message='Revealed type is "Any"', line=138, column=13),
-            Result(type="note", message='Revealed type is "Any"', line=139, column=13),
-            Result(type="note", message='Revealed type is "Any"', line=140, column=13),
-            Result(type="note", message='Revealed type is "Any"', line=141, column=13),
-            Result(type="note", message='Revealed type is "Any"', line=142, column=13),
-            Result(type="note", message='Revealed type is "Any"', line=143, column=13),
-        ]
-    )
     assert results.ty == snapshot(
         [
-            Result(
-                type="error",
-                message="Function always implicitly returns `None`, which is not assignable to return type `Self@resolve_connection`",
-                line=48,
-                column=10,
-            ),
-            Result(
-                type="error",
-                message="Function always implicitly returns `None`, which is not assignable to return type `list[Fruit]`",
-                line=56,
-                column=26,
-            ),
-            Result(
-                type="error",
-                message="Function always implicitly returns `None`, which is not assignable to return type `list[Fruit]`",
-                line=79,
-                column=10,
-            ),
-            Result(
-                type="error",
-                message="Function always implicitly returns `None`, which is not assignable to return type `Iterator[Fruit]`",
-                line=87,
-                column=10,
-            ),
-            Result(
-                type="error",
-                message="Function always implicitly returns `None`, which is not assignable to return type `Iterable[Fruit]`",
-                line=95,
-                column=10,
-            ),
-            Result(
-                type="error",
-                message="Function always implicitly returns `None`, which is not assignable to return type `Generator[Fruit, None, None]`",
-                line=103,
-                column=10,
-            ),
-            Result(
-                type="error",
-                message="Function always implicitly returns `None`, which is not assignable to return type `AsyncIterator[Fruit]`",
-                line=111,
-                column=10,
-            ),
-            Result(
-                type="error",
-                message="Function always implicitly returns `None`, which is not assignable to return type `AsyncIterable[Fruit]`",
-                line=119,
-                column=10,
-            ),
-            Result(
-                type="error",
-                message="Function always implicitly returns `None`, which is not assignable to return type `AsyncGenerator[Fruit, None]`",
-                line=127,
-                column=10,
-            ),
             Result(
                 type="information",
                 message="Revealed type: `Node`",

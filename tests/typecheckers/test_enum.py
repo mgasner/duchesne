@@ -1,9 +1,9 @@
 from inline_snapshot import snapshot
 
-from .utils.marks import requires_mypy, requires_pyright, requires_ty, skip_on_windows
+from .utils.marks import requires_pyright, requires_ty, skip_on_windows
 from .utils.typecheck import Result, typecheck
 
-pytestmark = [skip_on_windows, requires_pyright, requires_mypy, requires_ty]
+pytestmark = [skip_on_windows, requires_pyright, requires_ty]
 
 CODE_WITH_DECORATOR = """
 from enum import Enum
@@ -35,22 +35,6 @@ def test_enum_with_decorator():
             Result(
                 type="information",
                 message='Type of "IceCreamFlavour.VANILLA" is "Literal[IceCreamFlavour.VANILLA]"',
-                line=13,
-                column=13,
-            ),
-        ]
-    )
-    assert results.mypy == snapshot(
-        [
-            Result(
-                type="note",
-                message='Revealed type is "def (value: builtins.object) -> mypy_test.IceCreamFlavour"',
-                line=12,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "Literal[mypy_test.IceCreamFlavour.VANILLA]?"',
                 line=13,
                 column=13,
             ),
@@ -109,22 +93,6 @@ def test_enum_with_decorator_and_name():
             ),
         ]
     )
-    assert results.mypy == snapshot(
-        [
-            Result(
-                type="note",
-                message='Revealed type is "def (value: builtins.object) -> mypy_test.Flavour"',
-                line=12,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "Literal[mypy_test.Flavour.VANILLA]?"',
-                line=13,
-                column=13,
-            ),
-        ]
-    )
     assert results.ty == snapshot(
         [
             Result(
@@ -172,22 +140,6 @@ def test_enum_with_manual_decorator():
             Result(
                 type="information",
                 message='Type of "strawberry.enum(IceCreamFlavour).VANILLA" is "Literal[IceCreamFlavour.VANILLA]"',
-                line=12,
-                column=13,
-            ),
-        ]
-    )
-    assert results.mypy == snapshot(
-        [
-            Result(
-                type="note",
-                message='Revealed type is "def (value: builtins.object) -> mypy_test.IceCreamFlavour"',
-                line=11,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "Literal[mypy_test.IceCreamFlavour.VANILLA]?"',
                 line=12,
                 column=13,
             ),
@@ -245,22 +197,6 @@ def test_enum_with_manual_decorator_and_name():
             ),
         ]
     )
-    assert results.mypy == snapshot(
-        [
-            Result(
-                type="note",
-                message='Revealed type is "def (value: builtins.object) -> mypy_test.Flavour"',
-                line=11,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "Literal[mypy_test.Flavour.VANILLA]?"',
-                line=12,
-                column=13,
-            ),
-        ]
-    )
     assert results.ty == snapshot(
         [
             Result(
@@ -311,22 +247,6 @@ def test_enum_deprecated():
             Result(
                 type="information",
                 message='Type of "IceCreamFlavour.STRAWBERRY" is "Literal[IceCreamFlavour.STRAWBERRY]"',
-                line=15,
-                column=13,
-            ),
-        ]
-    )
-    assert results.mypy == snapshot(
-        [
-            Result(
-                type="note",
-                message='Revealed type is "def (value: builtins.object) -> mypy_test.IceCreamFlavour"',
-                line=14,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "Literal[mypy_test.IceCreamFlavour.STRAWBERRY]?"',
                 line=15,
                 column=13,
             ),

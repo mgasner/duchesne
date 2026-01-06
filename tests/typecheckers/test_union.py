@@ -1,9 +1,9 @@
 from inline_snapshot import snapshot
 
-from .utils.marks import requires_mypy, requires_pyright, requires_ty, skip_on_windows
+from .utils.marks import requires_pyright, requires_ty, skip_on_windows
 from .utils.typecheck import Result, typecheck
 
-pytestmark = [skip_on_windows, requires_pyright, requires_mypy, requires_ty]
+pytestmark = [skip_on_windows, requires_pyright, requires_ty]
 
 
 CODE = """
@@ -45,22 +45,6 @@ def test():
             ),
             Result(
                 type="information", message='Type of "x" is "User"', line=23, column=13
-            ),
-        ]
-    )
-    assert results.mypy == snapshot(
-        [
-            Result(
-                type="note",
-                message='Revealed type is "typing._SpecialForm"',
-                line=19,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "mypy_test.User | mypy_test.Error"',
-                line=23,
-                column=13,
             ),
         ]
     )

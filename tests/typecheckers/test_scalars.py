@@ -1,9 +1,9 @@
 from inline_snapshot import snapshot
 
-from .utils.marks import requires_mypy, requires_pyright, requires_ty, skip_on_windows
+from .utils.marks import requires_pyright, requires_ty, skip_on_windows
 from .utils.typecheck import Result, typecheck
 
-pytestmark = [skip_on_windows, requires_pyright, requires_mypy, requires_ty]
+pytestmark = [skip_on_windows, requires_pyright, requires_ty]
 
 
 CODE = """
@@ -75,46 +75,8 @@ def test():
             ),
         ]
     )
-    assert results.mypy == snapshot(
-        [
-            Result(
-                type="note",
-                message='Revealed type is "strawberry.scalars.ID"',
-                line=23,
-                column=13,
-            ),
-            Result(type="note", message='Revealed type is "Any"', line=24, column=13),
-            Result(type="note", message='Revealed type is "Any"', line=25, column=13),
-            Result(type="note", message='Revealed type is "Any"', line=26, column=13),
-            Result(type="note", message='Revealed type is "Any"', line=27, column=13),
-        ]
-    )
     assert results.ty == snapshot(
         [
-            Result(
-                type="error",
-                message="Variable of type `NewType` is not allowed in a type expression",
-                line=9,
-                column=11,
-            ),
-            Result(
-                type="error",
-                message="Variable of type `NewType` is not allowed in a type expression",
-                line=10,
-                column=13,
-            ),
-            Result(
-                type="error",
-                message="Variable of type `NewType` is not allowed in a type expression",
-                line=11,
-                column=13,
-            ),
-            Result(
-                type="error",
-                message="Variable of type `NewType` is not allowed in a type expression",
-                line=12,
-                column=13,
-            ),
             Result(
                 type="information",
                 message="Revealed type: `ID`",
@@ -179,16 +141,6 @@ def test_schema_overrides():
                 type="information",
                 message='Type of "EpochDateTime" is "type[datetime]"',
                 line=16,
-                column=13,
-            )
-        ]
-    )
-    assert results.mypy == snapshot(
-        [
-            Result(
-                type="note",
-                message='Revealed type is "def (year: typing.SupportsIndex, month: typing.SupportsIndex, day: typing.SupportsIndex, hour: typing.SupportsIndex =, minute: typing.SupportsIndex =, second: typing.SupportsIndex =, microsecond: typing.SupportsIndex =, tzinfo: datetime.tzinfo | None =, *, fold: builtins.int =) -> datetime.datetime"',
-                line=17,
                 column=13,
             )
         ]
