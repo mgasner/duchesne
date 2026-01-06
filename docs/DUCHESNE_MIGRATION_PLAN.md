@@ -509,10 +509,35 @@ def asdict(obj: Any) -> dict[str, object]:
 - `strawberry/schema_directive.py`
 
 ### Verification Criteria for Phase 6:
-- [ ] Pydantic integration tests pass
-- [ ] MyPy plugin works correctly
-- [ ] Directive system unchanged
-- [ ] All integration tests pass
+- [x] Pydantic integration tests pass
+- [ ] MyPy plugin works correctly (now using ty instead of mypy)
+- [x] Directive system unchanged
+- [x] All integration tests pass
+
+**Phase 6 Status: COMPLETE** (2026-01-06)
+
+**Key Implementation Details:**
+
+1. **StrawberryField.to_dataclass_field():**
+   - Added method to convert `StrawberryField` to `dataclasses.Field` for compatibility with `dataclasses.make_dataclass()`
+   - Preserves default, default_factory, repr, hash, init, compare, metadata, kw_only
+
+2. **Pydantic Integration Updates:**
+   - `DataclassCreationFields.to_tuple()` now converts `StrawberryField` to `dataclasses.Field`
+   - Store `StrawberryField` objects in `__strawberry_fields__` dict for retrieval by `_get_fields()`
+   - Ensures graphql_name, description, and other metadata are preserved
+
+3. **Type Resolver Updates:**
+   - `_get_fields()` now preserves `default_factory` from dataclass fields
+   - Properly handles both `default` and `default_factory` when creating new `StrawberryField` instances
+
+4. **Test Updates:**
+   - Updated tests to use `is_missing()` instead of checking `dataclasses.MISSING` directly
+   - Updated `test_info.py` to use `strawberry.asdict()` instead of `dataclasses.asdict()`
+
+5. **asdict Recursive Conversion:**
+   - Updated `asdict()` to recursively convert nested msgspec Structs
+   - Handles lists, tuples, and dicts containing Structs
 
 ---
 
