@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import dataclasses
 import warnings
 from functools import cached_property
 from typing import (
@@ -9,6 +8,8 @@ from typing import (
     Generic,
 )
 from typing_extensions import TypeVar
+
+import msgspec
 
 from .nodes import convert_selections
 
@@ -27,8 +28,7 @@ ContextType = TypeVar("ContextType", default=Any)
 RootValueType = TypeVar("RootValueType", default=Any)
 
 
-@dataclasses.dataclass
-class Info(Generic[ContextType, RootValueType]):
+class Info(msgspec.Struct, Generic[ContextType, RootValueType], dict=True):
     """Class containing information about the current execution.
 
     This class is passed to resolvers when there's an argument with type `Info`.

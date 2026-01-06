@@ -247,6 +247,13 @@ def type(
         if sys.version_info >= (3, 10, 1):
             kwargs["kw_only"] = dataclasses.MISSING
 
+        strawberry_fields_dict = {
+            field.name: field.field
+            for field in all_model_fields
+            if isinstance(field.field, StrawberryField)
+        }
+        namespace["__strawberry_fields__"] = strawberry_fields_dict
+
         cls = dataclasses.make_dataclass(
             cls.__name__,
             [field.to_tuple() for field in all_model_fields],

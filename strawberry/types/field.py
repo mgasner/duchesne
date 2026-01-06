@@ -3,7 +3,6 @@ from __future__ import annotations
 import contextlib
 import copy
 import dataclasses
-import sys
 from collections.abc import Awaitable, Callable, Coroutine, Mapping, Sequence
 from functools import cached_property
 from typing import (
@@ -17,6 +16,7 @@ from typing import (
 )
 
 from strawberry.annotation import StrawberryAnnotation
+from strawberry.compat import MISSING, is_missing
 from strawberry.exceptions import InvalidArgumentTypeError, InvalidDefaultFactoryError
 from strawberry.types.base import (
     StrawberryType,
@@ -76,9 +76,41 @@ def _is_generic(resolver_type: StrawberryType | type) -> bool:
     return False
 
 
-class StrawberryField(dataclasses.Field):
+class StrawberryField:
+    """A field in a Strawberry type.
+    
+    This class provides a dataclasses.Field-compatible interface while being
+    independent of the dataclasses machinery, enabling migration to msgspec.
+    """
+
     type_annotation: StrawberryAnnotation | None
-    default_resolver: Callable[[Any, str], object] = getattr
+
+    __slots__ = (
+        "name",
+        "_type",
+        "default",
+        "default_factory",
+        "repr",
+        "hash",
+        "init",
+        "compare",
+        "metadata",
+        "kw_only",
+        "graphql_name",
+        "type_annotation",
+        "description",
+        "origin",
+        "_arguments",
+        "_base_resolver",
+        "default_value",
+        "is_subscription",
+        "permission_classes",
+        "directives",
+        "extensions",
+        "deprecation_reason",
+        "default_resolver",
+        "__dict__",
+    )
 
     def __init__(
         self,
@@ -90,34 +122,26 @@ class StrawberryField(dataclasses.Field):
         description: str | None = None,
         base_resolver: StrawberryResolver | None = None,
         permission_classes: list[type[BasePermission]] = (),  # type: ignore
-        default: object = dataclasses.MISSING,
-        default_factory: Callable[[], Any] | object = dataclasses.MISSING,
+        default: object = MISSING,
+        default_factory: Callable[[], Any] | object = MISSING,
         metadata: Mapping[Any, Any] | None = None,
         deprecation_reason: str | None = None,
         directives: Sequence[object] = (),
         extensions: list[FieldExtension] = (),  # type: ignore
     ) -> None:
-        # basic fields are fields with no provided resolver
         is_basic_field = not base_resolver
 
-        kwargs: Any = {
-            "kw_only": True,
-        }
-
-        # doc was added to python 3.14 and it is required
-        if sys.version_info >= (3, 14):
-            kwargs["doc"] = None
-
-        super().__init__(
-            default=default,
-            default_factory=default_factory,  # type: ignore
-            init=is_basic_field,
-            repr=is_basic_field,
-            compare=is_basic_field,
-            hash=None,
-            metadata=metadata or {},
-            **kwargs,
-        )
+        self.name: str = ""
+        self._type: Any = None
+        self.default = default
+        self.default_factory = default_factory
+        self.init = is_basic_field
+        self.repr = is_basic_field
+        self.compare = is_basic_field
+        self.hash: bool | None = None
+        self.metadata: Mapping[Any, Any] = metadata or {}
+        self.kw_only = True
+        self.default_resolver: Callable[[Any, str], object] = getattr
 
         self.graphql_name = graphql_name
         if python_name is not None:
@@ -396,6 +420,23 @@ class StrawberryField(dataclasses.Field):
     def is_async(self) -> bool:
         return self._has_async_base_resolver
 
+    def to_dataclass_field(self) -> dataclasses.Field:
+        """Convert this StrawberryField to a dataclasses.Field.
+        
+        This is needed for compatibility with dataclasses.make_dataclass,
+        which expects dataclasses.Field objects.
+        """
+        return dataclasses.field(
+            default=self.default,
+            default_factory=self.default_factory if callable(self.default_factory) else dataclasses.MISSING,
+            repr=self.repr,
+            hash=self.hash,
+            init=self.init,
+            compare=self.compare,
+            metadata=dict(self.metadata) if self.metadata else {},
+            kw_only=self.kw_only,
+        )
+
 
 # NOTE: we are separating the sync and async resolvers because using both
 # in the same function will cause mypy to raise an error. Not sure if it is a bug
@@ -411,8 +452,8 @@ def field(
     init: Literal[False] = False,
     permission_classes: list[type[BasePermission]] | None = None,
     deprecation_reason: str | None = None,
-    default: Any = dataclasses.MISSING,
-    default_factory: Callable[..., object] | object = dataclasses.MISSING,
+    default: Any = MISSING,
+    default_factory: Callable[..., object] | object = MISSING,
     metadata: Mapping[Any, Any] | None = None,
     directives: Sequence[object] | None = (),
     extensions: list[FieldExtension] | None = None,
@@ -430,8 +471,8 @@ def field(
     init: Literal[False] = False,
     permission_classes: list[type[BasePermission]] | None = None,
     deprecation_reason: str | None = None,
-    default: Any = dataclasses.MISSING,
-    default_factory: Callable[..., object] | object = dataclasses.MISSING,
+    default: Any = MISSING,
+    default_factory: Callable[..., object] | object = MISSING,
     metadata: Mapping[Any, Any] | None = None,
     directives: Sequence[object] | None = (),
     extensions: list[FieldExtension] | None = None,
@@ -448,8 +489,8 @@ def field(
     init: Literal[True] = True,
     permission_classes: list[type[BasePermission]] | None = None,
     deprecation_reason: str | None = None,
-    default: Any = dataclasses.MISSING,
-    default_factory: Callable[..., object] | object = dataclasses.MISSING,
+    default: Any = MISSING,
+    default_factory: Callable[..., object] | object = MISSING,
     metadata: Mapping[Any, Any] | None = None,
     directives: Sequence[object] | None = (),
     extensions: list[FieldExtension] | None = None,
@@ -466,8 +507,8 @@ def field(
     description: str | None = None,
     permission_classes: list[type[BasePermission]] | None = None,
     deprecation_reason: str | None = None,
-    default: Any = dataclasses.MISSING,
-    default_factory: Callable[..., object] | object = dataclasses.MISSING,
+    default: Any = MISSING,
+    default_factory: Callable[..., object] | object = MISSING,
     metadata: Mapping[Any, Any] | None = None,
     directives: Sequence[object] | None = (),
     extensions: list[FieldExtension] | None = None,
@@ -484,8 +525,8 @@ def field(
     description: str | None = None,
     permission_classes: list[type[BasePermission]] | None = None,
     deprecation_reason: str | None = None,
-    default: Any = dataclasses.MISSING,
-    default_factory: Callable[..., object] | object = dataclasses.MISSING,
+    default: Any = MISSING,
+    default_factory: Callable[..., object] | object = MISSING,
     metadata: Mapping[Any, Any] | None = None,
     directives: Sequence[object] | None = (),
     extensions: list[FieldExtension] | None = None,
@@ -501,8 +542,8 @@ def field(
     description: str | None = None,
     permission_classes: list[type[BasePermission]] | None = None,
     deprecation_reason: str | None = None,
-    default: Any = dataclasses.MISSING,
-    default_factory: Callable[..., object] | object = dataclasses.MISSING,
+    default: Any = MISSING,
+    default_factory: Callable[..., object] | object = MISSING,
     metadata: Mapping[Any, Any] | None = None,
     directives: Sequence[object] | None = (),
     extensions: list[FieldExtension] | None = None,

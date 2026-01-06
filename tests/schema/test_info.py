@@ -1,4 +1,3 @@
-import dataclasses
 import json
 from typing import Annotated, Optional
 
@@ -7,6 +6,7 @@ import pytest
 import strawberry
 from strawberry.types.base import StrawberryOptional
 from strawberry.types.nodes import FragmentSpread, InlineFragment, SelectedField
+from strawberry.types.object_type import asdict
 from strawberry.types.unset import UNSET
 
 
@@ -36,7 +36,7 @@ def test_info_has_the_correct_shape():
                 operation=str(info.operation),
                 field_name=info.field_name,
                 python_name=info.python_name,
-                selected_field=json.dumps(dataclasses.asdict(*info.selected_fields)),
+                selected_field=json.dumps(asdict(*info.selected_fields)),
                 variable_values=str(info.variable_values),
                 context_equal=info.context == my_context,
                 root_equal=info.root_value == root_value,

@@ -40,6 +40,7 @@ from graphql import (
 from graphql.language.directive_locations import DirectiveLocation
 
 from strawberry.annotation import StrawberryAnnotation
+from strawberry.compat import is_missing
 from strawberry.exceptions import (
     DuplicatedTypeName,
     InvalidTypeInputForUnion,
@@ -373,7 +374,7 @@ class GraphQLCoreConverter:
         args: dict[str, GraphQLArgument] = {}
         for field in strawberry_directive.fields:
             default = field.default
-            if default == dataclasses.MISSING:
+            if is_missing(default):
                 default = UNSET
 
             name = self.config.name_converter.get_graphql_name(field)
@@ -455,7 +456,7 @@ class GraphQLCoreConverter:
         default_value: object
         if isinstance(field.type, StrawberryMaybe):
             default_value = Undefined
-        elif field.default_value is UNSET or field.default_value is dataclasses.MISSING:
+        elif field.default_value is UNSET or is_missing(field.default_value):
             default_value = Undefined
         else:
             default_value = field.default_value

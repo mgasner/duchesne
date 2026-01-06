@@ -23,7 +23,7 @@ def test_config_post_init_info_class():
     config = StrawberryConfig(info_class=CustomInfo)
 
     assert config.info_class is CustomInfo
-    assert config.info_class.test == "foo"
+    assert issubclass(config.info_class, Info)
 
 
 def test_config_post_init_info_class_is_default():

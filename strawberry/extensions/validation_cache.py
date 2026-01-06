@@ -40,7 +40,7 @@ class ValidationCache(SchemaExtension):
         errors = self.cached_validate_document(
             execution_context.schema._schema,
             execution_context.graphql_document,
-            execution_context.validation_rules,
+            execution_context.get_validation_rules(),
         )
         execution_context.pre_execution_errors = errors
         yield

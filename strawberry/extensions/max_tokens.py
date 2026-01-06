@@ -35,6 +35,8 @@ class MaxTokensLimiter(SchemaExtension):
         self.max_token_count = max_token_count
 
     def on_operation(self) -> Iterator[None]:
+        if self.execution_context.parse_options is None:
+            self.execution_context.parse_options = {}
         self.execution_context.parse_options["max_tokens"] = self.max_token_count
         yield
 

@@ -134,15 +134,16 @@ def validate_document(
 def _run_validation(execution_context: ExecutionContext) -> None:
     # Check if there are any validation rules or if validation has
     # already been run by an extension
+    validation_rules = execution_context.get_validation_rules()
     if (
-        len(execution_context.validation_rules) > 0
+        len(validation_rules) > 0
         and execution_context.pre_execution_errors is None
     ):
         assert execution_context.graphql_document
         execution_context.pre_execution_errors = validate_document(
             execution_context.schema._schema,
             execution_context.graphql_document,
-            execution_context.validation_rules,
+            validation_rules,
         )
 
 
@@ -424,7 +425,7 @@ class Schema(BaseSchema):
         return ExecutionContext(
             query=query,
             schema=self,
-            allowed_operations=allowed_operation_types,
+            allowed_operations=tuple(allowed_operation_types),
             context=context_value,
             root_value=root_value,
             variables=variable_values,
@@ -706,7 +707,7 @@ class Schema(BaseSchema):
                         if not execution_context.graphql_document:
                             execution_context.graphql_document = parse(
                                 execution_context.query,
-                                **execution_context.parse_options,
+                                **execution_context.get_parse_options(),
                             )
 
                     except GraphQLError as error:

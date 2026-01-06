@@ -8,6 +8,7 @@ from typing import (
 )
 from typing_extensions import Protocol, TypedDict, deprecated
 
+import msgspec
 from graphql import specified_rules
 
 from strawberry.utils.operation import get_first_operation, get_operation_type
@@ -26,40 +27,43 @@ if TYPE_CHECKING:
     from .graphql import OperationType
 
 
-@dataclasses.dataclass
-class ExecutionContext:
+class ExecutionContext(msgspec.Struct, kw_only=True):
+    """Context for GraphQL execution.
+    
+    This struct holds all the information needed during GraphQL execution,
+    including the query, schema, variables, and results.
+    """
     query: str | None
     schema: Schema
-    allowed_operations: Iterable[OperationType]
+    allowed_operations: tuple[OperationType, ...]
     context: Any = None
     variables: dict[str, Any] | None = None
-    parse_options: ParseOptions = dataclasses.field(
-        default_factory=lambda: ParseOptions()
-    )
     root_value: Any | None = None
-    validation_rules: tuple[type[ASTValidationRule], ...] = dataclasses.field(
-        default_factory=lambda: tuple(specified_rules)
-    )
-
-    # The operation name that is provided by the request
-    provided_operation_name: dataclasses.InitVar[str | None] = None
-
-    # Values that get populated during the GraphQL execution so that they can be
-    # accessed by extensions
+    provided_operation_name: str | None = None
     graphql_document: DocumentNode | None = None
     pre_execution_errors: list[GraphQLError] | None = None
     result: GraphQLExecutionResult | None = None
-    extensions_results: dict[str, Any] = dataclasses.field(default_factory=dict)
-
+    parse_options: ParseOptions | None = None
+    validation_rules: tuple[type[ASTValidationRule], ...] | None = None
+    extensions_results: dict[str, Any] | None = None
     operation_extensions: dict[str, Any] | None = None
 
-    def __post_init__(self, provided_operation_name: str | None) -> None:
-        self._provided_operation_name = provided_operation_name
+    def get_parse_options(self) -> ParseOptions:
+        """Get parse options, returning empty dict if not set."""
+        return self.parse_options if self.parse_options is not None else ParseOptions()
+
+    def get_validation_rules(self) -> tuple[type[ASTValidationRule], ...]:
+        """Get validation rules, returning default rules if not set."""
+        return self.validation_rules if self.validation_rules is not None else tuple(specified_rules)
+
+    def get_extensions_results(self) -> dict[str, Any]:
+        """Get extensions results, returning empty dict if not set."""
+        return self.extensions_results if self.extensions_results is not None else {}
 
     @property
     def operation_name(self) -> str | None:
-        if self._provided_operation_name is not None:
-            return self._provided_operation_name
+        if self.provided_operation_name is not None:
+            return self.provided_operation_name
 
         definition = self._get_first_operation()
         if not definition:
@@ -92,14 +96,13 @@ class ExecutionContext:
         return self.pre_execution_errors
 
 
-@dataclasses.dataclass
-class ExecutionResult:
+class ExecutionResult(msgspec.Struct, kw_only=True):
+    """Result of a GraphQL execution."""
     data: dict[str, Any] | None
     errors: list[GraphQLError] | None
     extensions: dict[str, Any] | None = None
 
 
-@dataclasses.dataclass
 class PreExecutionError(ExecutionResult):
     """Differentiate between a normal execution result and an immediate error.
 

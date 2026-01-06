@@ -11,8 +11,9 @@ Note Python dicts maintain ordering (for all supported versions).
 
 from __future__ import annotations
 
-import dataclasses
 from typing import TYPE_CHECKING, Any, Union
+
+import msgspec
 
 from graphql.language import FieldNode as GQLFieldNode
 from graphql.language import FragmentSpreadNode as GQLFragmentSpreadNode
@@ -80,8 +81,7 @@ def convert_selections(
     return selections
 
 
-@dataclasses.dataclass
-class FragmentSpread:
+class FragmentSpread(msgspec.Struct):
     """Wrapper for a FragmentSpreadNode."""
 
     name: str
@@ -108,8 +108,7 @@ class FragmentSpread:
         )
 
 
-@dataclasses.dataclass
-class InlineFragment:
+class InlineFragment(msgspec.Struct):
     """Wrapper for a InlineFragmentNode."""
 
     type_condition: str
@@ -131,8 +130,7 @@ class InlineFragment:
         )
 
 
-@dataclasses.dataclass
-class SelectedField:
+class SelectedField(msgspec.Struct):
     """Wrapper for a FieldNode."""
 
     name: str
