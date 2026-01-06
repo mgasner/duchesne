@@ -246,60 +246,6 @@ def test():
     assert results.ty == snapshot(
         [
             Result(
-                type="error",
-                message="Function always implicitly returns `None`, which is not assignable to return type `Self@resolve_connection`",
-                line=48,
-                column=10,
-            ),
-            Result(
-                type="error",
-                message="Function always implicitly returns `None`, which is not assignable to return type `list[Fruit]`",
-                line=56,
-                column=26,
-            ),
-            Result(
-                type="error",
-                message="Function always implicitly returns `None`, which is not assignable to return type `list[Fruit]`",
-                line=79,
-                column=10,
-            ),
-            Result(
-                type="error",
-                message="Function always implicitly returns `None`, which is not assignable to return type `Iterator[Fruit]`",
-                line=87,
-                column=10,
-            ),
-            Result(
-                type="error",
-                message="Function always implicitly returns `None`, which is not assignable to return type `Iterable[Fruit]`",
-                line=95,
-                column=10,
-            ),
-            Result(
-                type="error",
-                message="Function always implicitly returns `None`, which is not assignable to return type `Generator[Fruit, None, None]`",
-                line=103,
-                column=10,
-            ),
-            Result(
-                type="error",
-                message="Function always implicitly returns `None`, which is not assignable to return type `AsyncIterator[Fruit]`",
-                line=111,
-                column=10,
-            ),
-            Result(
-                type="error",
-                message="Function always implicitly returns `None`, which is not assignable to return type `AsyncIterable[Fruit]`",
-                line=119,
-                column=10,
-            ),
-            Result(
-                type="error",
-                message="Function always implicitly returns `None`, which is not assignable to return type `AsyncGenerator[Fruit, None]`",
-                line=127,
-                column=10,
-            ),
-            Result(
                 type="information",
                 message="Revealed type: `Node`",
                 line=130,

@@ -44,12 +44,6 @@ def test():
         [
             Result(
                 type="error",
-                message="No argument provided for required parameter `name`",
-                line=10,
-                column=1,
-            ),
-            Result(
-                type="error",
                 message="Too many positional arguments: expected 0, got 1",
                 line=10,
                 column=6,

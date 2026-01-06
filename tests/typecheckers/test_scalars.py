@@ -78,30 +78,6 @@ def test():
     assert results.ty == snapshot(
         [
             Result(
-                type="error",
-                message="Variable of type `NewType` is not allowed in a type expression",
-                line=9,
-                column=11,
-            ),
-            Result(
-                type="error",
-                message="Variable of type `NewType` is not allowed in a type expression",
-                line=10,
-                column=13,
-            ),
-            Result(
-                type="error",
-                message="Variable of type `NewType` is not allowed in a type expression",
-                line=11,
-                column=13,
-            ),
-            Result(
-                type="error",
-                message="Variable of type `NewType` is not allowed in a type expression",
-                line=12,
-                column=13,
-            ),
-            Result(
                 type="information",
                 message="Revealed type: `ID`",
                 line=23,

@@ -38,12 +38,6 @@ def test():
         [
             Result(
                 type="error",
-                message="No argument provided for required parameter `name`",
-                line=11,
-                column=1,
-            ),
-            Result(
-                type="error",
                 message="Argument `n` does not match any known parameter",
                 line=11,
                 column=11,

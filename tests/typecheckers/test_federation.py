@@ -58,12 +58,6 @@ def test_federation_type():
         [
             Result(
                 type="error",
-                message="No argument provided for required parameter `name`",
-                line=16,
-                column=1,
-            ),
-            Result(
-                type="error",
                 message="Argument `n` does not match any known parameter",
                 line=16,
                 column=6,
@@ -132,12 +126,6 @@ def test_federation_interface():
         [
             Result(
                 type="error",
-                message="No argument provided for required parameter `name`",
-                line=12,
-                column=1,
-            ),
-            Result(
-                type="error",
                 message="Argument `n` does not match any known parameter",
                 line=12,
                 column=6,
@@ -202,12 +190,6 @@ def test_federation_input():
     )
     assert results.ty == snapshot(
         [
-            Result(
-                type="error",
-                message="No argument provided for required parameter `name`",
-                line=10,
-                column=1,
-            ),
             Result(
                 type="error",
                 message="Argument `n` does not match any known parameter",
