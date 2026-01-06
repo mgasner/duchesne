@@ -65,33 +65,6 @@ jobs:
 
       - run: pip install nox uv
       - run: nox -r -t tests -s "${{ matrix.session.session }}"
-  benchmarks:
-    name: 📈 Benchmarks
-
-    # Using this version because CodSpeed doesn't support Ubuntu 24.04 LTS yet
-    runs-on: ubuntu-22.04
-
-    permissions:
-      contents: read
-      id-token: write
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
-      - uses: actions/setup-python@v5
-        id: setup-python
-        with:
-          python-version: "3.12"
-          architecture: x64
-
-      - run: uv sync --group dev
-
-      - name: Run benchmarks
-        uses: CodSpeedHQ/action@v4
-        with:
-          mode: simulation
-          run: uv run pytest tests/benchmarks --codspeed -p no:codeflash-benchmark
 
   lint:
     name: ✨ Lint
