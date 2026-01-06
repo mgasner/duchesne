@@ -172,6 +172,10 @@ def _get_fields(
             origin = origins.get(field.name, cls)
             module = sys.modules[origin.__module__]
 
+            # Get default and default_factory from the dataclass field
+            dc_default = field.default if not is_missing(field.default) else MISSING
+            dc_default_factory = field.default_factory if not is_missing(field.default_factory) else MISSING
+
             # Create a StrawberryField, for fields of Types #1 and #2a
             field = StrawberryField(  # noqa: PLW2901
                 python_name=field.name,
@@ -181,7 +185,8 @@ def _get_fields(
                     namespace=module.__dict__,
                 ),
                 origin=origin,
-                default=getattr(cls, field.name, MISSING),
+                default=dc_default,
+                default_factory=dc_default_factory,
             )
 
         field_name = field.python_name

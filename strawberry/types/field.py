@@ -420,6 +420,23 @@ class StrawberryField:
     def is_async(self) -> bool:
         return self._has_async_base_resolver
 
+    def to_dataclass_field(self) -> dataclasses.Field:
+        """Convert this StrawberryField to a dataclasses.Field.
+        
+        This is needed for compatibility with dataclasses.make_dataclass,
+        which expects dataclasses.Field objects.
+        """
+        return dataclasses.field(
+            default=self.default,
+            default_factory=self.default_factory if callable(self.default_factory) else dataclasses.MISSING,
+            repr=self.repr,
+            hash=self.hash,
+            init=self.init,
+            compare=self.compare,
+            metadata=dict(self.metadata) if self.metadata else {},
+            kw_only=self.kw_only,
+        )
+
 
 # NOTE: we are separating the sync and async resolvers because using both
 # in the same function will cause mypy to raise an error. Not sure if it is a bug

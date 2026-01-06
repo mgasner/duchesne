@@ -58,10 +58,12 @@ class DataclassCreationFields(NamedTuple):
 
     name: str
     field_type: type
-    field: dataclasses.Field
+    field: dataclasses.Field | Any
 
     def to_tuple(self) -> tuple[str, type, dataclasses.Field]:
-        # fields parameter wants (name, type, Field)
+        from strawberry.types.field import StrawberryField
+        if isinstance(self.field, StrawberryField):
+            return self.name, self.field_type, self.field.to_dataclass_field()
         return self.name, self.field_type, self.field
 
 

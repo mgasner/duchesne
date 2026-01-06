@@ -6,6 +6,7 @@ import pydantic
 import pytest
 
 import strawberry
+from strawberry.compat import is_missing
 from strawberry.experimental.pydantic.exceptions import MissingFieldsListError
 from strawberry.schema_directive import Location
 from strawberry.types.base import (
@@ -412,9 +413,9 @@ def test_type_with_fields_mutable_default():
 
     [groups_field, friends_field] = definition.fields
 
-    assert groups_field.default is dataclasses.MISSING
-    assert groups_field.default_factory is dataclasses.MISSING
-    assert friends_field.default is dataclasses.MISSING
+    assert is_missing(groups_field.default)
+    assert is_missing(groups_field.default_factory)
+    assert is_missing(friends_field.default)
 
     # check that we really made a copy
     assert friends_field.default_factory() is not empty_list
