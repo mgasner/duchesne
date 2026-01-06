@@ -35,7 +35,7 @@ class StructFieldWrapper(StructFieldBase):
         
         if field_info.default is not msgspec.UNSET:
             default = field_info.default
-        elif field_info.default_factory is not msgspec.UNSET:
+        if field_info.default_factory is not msgspec.UNSET:
             default_factory = field_info.default_factory
 
         super().__init__(
