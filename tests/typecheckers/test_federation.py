@@ -1,9 +1,9 @@
 from inline_snapshot import snapshot
 
-from .utils.marks import requires_mypy, requires_pyright, requires_ty, skip_on_windows
+from .utils.marks import requires_pyright, requires_ty, skip_on_windows
 from .utils.typecheck import Result, typecheck
 
-pytestmark = [skip_on_windows, requires_pyright, requires_mypy, requires_ty]
+pytestmark = [skip_on_windows, requires_pyright, requires_ty]
 
 
 CODE = """
@@ -49,28 +49,6 @@ def test_federation_type():
             Result(
                 type="information",
                 message='Type of "User.__init__" is "(self: User, *, name: str) -> None"',
-                line=19,
-                column=13,
-            ),
-        ]
-    )
-    assert results.mypy == snapshot(
-        [
-            Result(
-                type="error",
-                message='Unexpected keyword argument "n" for "User"',
-                line=16,
-                column=1,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "def (*, name: builtins.str) -> mypy_test.User"',
-                line=18,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "def (self: mypy_test.User, *, name: builtins.str)"',
                 line=19,
                 column=13,
             ),
@@ -150,28 +128,6 @@ def test_federation_interface():
             ),
         ]
     )
-    assert results.mypy == snapshot(
-        [
-            Result(
-                type="error",
-                message='Unexpected keyword argument "n" for "User"',
-                line=12,
-                column=1,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "def (*, name: builtins.str, age: builtins.int) -> mypy_test.User"',
-                line=14,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "def (self: mypy_test.User, *, name: builtins.str, age: builtins.int)"',
-                line=15,
-                column=13,
-            ),
-        ]
-    )
     assert results.ty == snapshot(
         [
             Result(
@@ -239,28 +195,6 @@ def test_federation_input():
             Result(
                 type="information",
                 message='Type of "User.__init__" is "(self: User, *, name: str) -> None"',
-                line=13,
-                column=13,
-            ),
-        ]
-    )
-    assert results.mypy == snapshot(
-        [
-            Result(
-                type="error",
-                message='Unexpected keyword argument "n" for "User"',
-                line=10,
-                column=1,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "def (*, name: builtins.str) -> mypy_test.User"',
-                line=12,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "def (self: mypy_test.User, *, name: builtins.str)"',
                 line=13,
                 column=13,
             ),

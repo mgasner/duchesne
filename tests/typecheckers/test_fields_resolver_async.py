@@ -1,9 +1,9 @@
 from inline_snapshot import snapshot
 
-from .utils.marks import requires_mypy, requires_pyright, requires_ty, skip_on_windows
+from .utils.marks import requires_pyright, requires_ty, skip_on_windows
 from .utils.typecheck import Result, typecheck
 
-pytestmark = [skip_on_windows, requires_pyright, requires_mypy, requires_ty]
+pytestmark = [skip_on_windows, requires_pyright, requires_ty]
 
 CODE = """
 import strawberry
@@ -57,34 +57,6 @@ def test():
             Result(
                 type="information",
                 message='Type of "User.__init__" is "(self: User, *, name: str) -> None"',
-                line=19,
-                column=13,
-            ),
-        ]
-    )
-    assert results.mypy == snapshot(
-        [
-            Result(
-                type="error",
-                message='Incompatible types in assignment (expression has type "int", variable has type "str")',
-                line=12,
-                column=22,
-            ),
-            Result(
-                type="error",
-                message='Unexpected keyword argument "n" for "User"',
-                line=16,
-                column=1,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "def (*, name: builtins.str) -> mypy_test.User"',
-                line=18,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "def (self: mypy_test.User, *, name: builtins.str)"',
                 line=19,
                 column=13,
             ),

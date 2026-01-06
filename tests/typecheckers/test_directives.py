@@ -1,9 +1,9 @@
 from inline_snapshot import snapshot
 
-from .utils.marks import requires_mypy, requires_pyright, requires_ty, skip_on_windows
+from .utils.marks import requires_pyright, requires_ty, skip_on_windows
 from .utils.typecheck import Result, typecheck
 
-pytestmark = [skip_on_windows, requires_pyright, requires_mypy, requires_ty]
+pytestmark = [skip_on_windows, requires_pyright, requires_ty]
 
 
 CODE = """
@@ -33,16 +33,6 @@ def test():
             Result(
                 type="information",
                 message='Type of "make_int" is "StrawberryDirective[int]"',
-                line=16,
-                column=13,
-            )
-        ]
-    )
-    assert results.mypy == snapshot(
-        [
-            Result(
-                type="note",
-                message='Revealed type is "strawberry.directive.StrawberryDirective[builtins.int]"',
                 line=16,
                 column=13,
             )

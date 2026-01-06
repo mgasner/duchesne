@@ -1,9 +1,9 @@
 from inline_snapshot import snapshot
 
-from .utils.marks import requires_mypy, requires_pyright, requires_ty, skip_on_windows
+from .utils.marks import requires_pyright, requires_ty, skip_on_windows
 from .utils.typecheck import Result, typecheck
 
-pytestmark = [skip_on_windows, requires_pyright, requires_mypy, requires_ty]
+pytestmark = [skip_on_windows, requires_pyright, requires_ty]
 
 CODE = """
 import strawberry
@@ -81,46 +81,6 @@ def test():
             Result(
                 type="information",
                 message='Type of "UserInput.__init__" is "(self: UserInput, *, age: int, name: str) -> None"',
-                line=33,
-                column=13,
-            ),
-        ]
-    )
-    assert results.mypy == snapshot(
-        [
-            Result(
-                type="error",
-                message='Unexpected keyword argument "n" for "User"',
-                line=24,
-                column=1,
-            ),
-            Result(
-                type="error",
-                message='Unexpected keyword argument "n" for "UserInput"',
-                line=27,
-                column=1,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "def (*, age: builtins.int, name: builtins.str) -> mypy_test.User"',
-                line=29,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "def (self: mypy_test.User, *, age: builtins.int, name: builtins.str)"',
-                line=30,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "def (*, age: builtins.int, name: builtins.str) -> mypy_test.UserInput"',
-                line=32,
-                column=13,
-            ),
-            Result(
-                type="note",
-                message='Revealed type is "def (self: mypy_test.UserInput, *, age: builtins.int, name: builtins.str)"',
                 line=33,
                 column=13,
             ),

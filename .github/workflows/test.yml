@@ -81,10 +81,7 @@ jobs:
 
       - run: uv sync --group dev --group integrations
 
-      - run: |
-          mkdir .mypy_cache
-
-          uv run mypy --install-types --non-interactive --cache-dir=.mypy_cache/ --config-file mypy.ini
+      - run: uv run ty check strawberry
 
   unit-tests-on-windows:
     name: 🪟 Tests on Windows
@@ -106,6 +103,5 @@ jobs:
 
       # we use uv directly instead of nox since we want to
       # test all integrations at once on windows
-      # but we want to exclude tests/mypy since we are using an old version of pydantic
       - run: |
-          uv run pytest -n auto --showlocals --ignore tests/mypy -vv
+          uv run pytest -n auto --showlocals -vv

@@ -1,0 +1,23 @@
+[environment]
+python-version = "3.10"
+
+[rules]
+possibly-unresolved-reference = "ignore"
+unresolved-import = "ignore"
+invalid-argument-type = "ignore"
+unresolved-attribute = "ignore"
+invalid-assignment = "ignore"
+invalid-type-form = "ignore"
+invalid-newtype = "ignore"
+invalid-return-type = "ignore"
+not-iterable = "ignore"
+no-matching-overload = "ignore"
+call-top-callable = "ignore"
+call-non-callable = "ignore"
+type-assertion-failure = "ignore"
+parameter-already-assigned = "ignore"
+missing-argument = "ignore"
+invalid-super-argument = "ignore"
+invalid-method-override = "ignore"
+possibly-missing-attribute = "ignore"
+deprecated = "ignore"

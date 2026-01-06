@@ -195,7 +195,6 @@ def tests_typecheckers(session: nox.Session) -> None:
         "uv", "run",
         "--with", "pyright",
         "--with", "pydantic",
-        "--with", "mypy",
         "--with", "ty",
         "pytest",
         "--cov=.",

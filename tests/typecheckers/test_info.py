@@ -1,9 +1,9 @@
 from inline_snapshot import snapshot
 
-from .utils.marks import requires_mypy, requires_pyright, requires_ty, skip_on_windows
+from .utils.marks import requires_pyright, requires_ty, skip_on_windows
 from .utils.typecheck import Result, typecheck
 
-pytestmark = [skip_on_windows, requires_pyright, requires_mypy, requires_ty]
+pytestmark = [skip_on_windows, requires_pyright, requires_ty]
 
 
 def test_with_params():
@@ -31,12 +31,6 @@ def example(info: strawberry.Info[None, None]) -> None:
                 line=6,
                 column=17,
             ),
-        ]
-    )
-    assert results.mypy == snapshot(
-        [
-            Result(type="note", message='Revealed type is "None"', line=5, column=17),
-            Result(type="note", message='Revealed type is "None"', line=6, column=17),
         ]
     )
     assert results.ty == snapshot(
@@ -84,12 +78,6 @@ def example(info: strawberry.Info[None]) -> None:
             ),
         ]
     )
-    assert results.mypy == snapshot(
-        [
-            Result(type="note", message='Revealed type is "None"', line=5, column=17),
-            Result(type="note", message='Revealed type is "Any"', line=6, column=17),
-        ]
-    )
     assert results.ty == snapshot(
         [
             Result(
@@ -133,12 +121,6 @@ def example(info: strawberry.Info) -> None:
                 line=6,
                 column=17,
             ),
-        ]
-    )
-    assert results.mypy == snapshot(
-        [
-            Result(type="note", message='Revealed type is "Any"', line=5, column=17),
-            Result(type="note", message='Revealed type is "Any"', line=6, column=17),
         ]
     )
     assert results.ty == snapshot(
