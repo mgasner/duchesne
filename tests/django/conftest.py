@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 
 @pytest.fixture
 def graphql_client() -> GraphQLTestClient:
+    django = pytest.importorskip("django")
     from django.test.client import Client
 
     from strawberry.django.test import GraphQLTestClient
