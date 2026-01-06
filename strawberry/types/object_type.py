@@ -496,7 +496,8 @@ def interface(
 def asdict(obj: Any) -> dict[str, object]:
     """Convert a strawberry object into a dictionary.
 
-    This wraps the dataclasses.asdict function to strawberry.
+    This wraps the dataclasses.asdict function to strawberry, with support
+    for msgspec Structs.
 
     Args:
         obj: The object to convert into a dictionary.
@@ -517,6 +518,9 @@ def asdict(obj: Any) -> dict[str, object]:
     # {"name": "Lorem", "age": 25}
     ```
     """
+    import msgspec
+    if hasattr(obj, "__struct_fields__"):
+        return msgspec.structs.asdict(obj)
     return dataclasses.asdict(obj)
 
 

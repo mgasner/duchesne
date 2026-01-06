@@ -454,12 +454,26 @@ def asdict(obj: Any) -> dict[str, object]:
 ```
 
 ### Verification Criteria for Phase 5:
-- [ ] All existing tests pass
-- [ ] `@strawberry.type` creates valid types
-- [ ] `@strawberry.input` creates valid input types
-- [ ] `@strawberry.interface` creates valid interfaces
-- [ ] `strawberry.asdict()` works with both old and new types
-- [ ] Schema string output unchanged
+- [x] All existing tests pass
+- [x] `@strawberry.type` creates valid types
+- [x] `@strawberry.input` creates valid input types
+- [x] `@strawberry.interface` creates valid interfaces
+- [x] `strawberry.asdict()` works with both old and new types
+- [x] Schema string output unchanged
+
+**Phase 5 Status: COMPLETE** (2026-01-06)
+
+**Key Implementation Details:**
+
+1. **StrawberryConfig Migration:**
+   - Converted from dataclass to plain class with `__slots__`
+   - Removed `InitVar` - `auto_camel_case` is now a regular field
+   - Initialization logic moved to `__init__` method
+   - Preserves same API and behavior
+
+2. **asdict Compatibility:**
+   - Updated `strawberry.asdict()` to detect msgspec Structs via `__struct_fields__`
+   - Uses `msgspec.structs.asdict()` for Structs, `dataclasses.asdict()` for dataclasses
 
 ---
 
