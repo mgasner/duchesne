@@ -45,7 +45,7 @@ INTEGRATIONS = [
 
 
 def _install_gql_core(session: nox.Session, version: str) -> None:
-    session.install(f"graphql-core=={version}")
+    session.run("uv", "pip", "install", f"graphql-core=={version}", external=True)
 
 
 gql_core_parametrize = nox.parametrize(
@@ -74,9 +74,11 @@ def tests(session: nox.Session, gql_core: str) -> None:
     markers = [item for sublist in markers for item in sublist]
 
     session.run(
+        "uv", "run", "--no-sync",
         "pytest",
         *COMMON_PYTEST_OPTIONS,
         *markers,
+        external=True,
     )
 
 
@@ -85,10 +87,10 @@ def tests(session: nox.Session, gql_core: str) -> None:
 def tests_django(session: nox.Session, django: str, gql_core: str) -> None:
     session.run_always("uv", "sync", "--group", "dev", external=True)
     _install_gql_core(session, gql_core)
-    session.install(f"django~={django}")
-    session.install("pytest-django")
+    session.run("uv", "pip", "install", f"django~={django}", external=True)
+    session.run("uv", "pip", "install", "pytest-django", external=True)
 
-    session.run("pytest", *COMMON_PYTEST_OPTIONS, "-m", "django")
+    session.run("uv", "run", "--no-sync", "pytest", *COMMON_PYTEST_OPTIONS, "-m", "django", external=True)
 
 
 @nox.session(python=["3.11"], name="Starlette tests", tags=["tests"])
@@ -96,9 +98,9 @@ def tests_django(session: nox.Session, django: str, gql_core: str) -> None:
 def tests_starlette(session: nox.Session, gql_core: str) -> None:
     session.run_always("uv", "sync", "--group", "dev", external=True)
 
-    session.install("starlette")
+    session.run("uv", "pip", "install", "starlette", external=True)
     _install_gql_core(session, gql_core)
-    session.run("pytest", *COMMON_PYTEST_OPTIONS, "-m", "asgi")
+    session.run("uv", "run", "--no-sync", "pytest", *COMMON_PYTEST_OPTIONS, "-m", "asgi", external=True)
 
 
 @nox.session(python=["3.11"], name="Test integrations", tags=["tests"])
@@ -118,15 +120,15 @@ def tests_starlette(session: nox.Session, gql_core: str) -> None:
 def tests_integrations(session: nox.Session, integration: str, gql_core: str) -> None:
     session.run_always("uv", "sync", "--group", "dev", external=True)
 
-    session.install(integration)
+    session.run("uv", "pip", "install", integration, external=True)
     _install_gql_core(session, gql_core)
     if integration == "aiohttp":
-        session.install("pytest-aiohttp")
+        session.run("uv", "pip", "install", "pytest-aiohttp", external=True)
     elif integration == "channels":
-        session.install("pytest-django")
-        session.install("daphne")
+        session.run("uv", "pip", "install", "pytest-django", external=True)
+        session.run("uv", "pip", "install", "daphne", external=True)
 
-    session.run("pytest", *COMMON_PYTEST_OPTIONS, "-m", integration)
+    session.run("uv", "run", "--no-sync", "pytest", *COMMON_PYTEST_OPTIONS, "-m", integration, external=True)
 
 
 @nox.session(
@@ -138,9 +140,10 @@ def tests_integrations(session: nox.Session, integration: str, gql_core: str) ->
 def test_pydantic(session: nox.Session, gql_core: str) -> None:
     session.run_always("uv", "sync", "--group", "dev", external=True)
 
-    session.install("pydantic~=1.10")
+    session.run("uv", "pip", "install", "pydantic~=1.10", external=True)
     _install_gql_core(session, gql_core)
     session.run(
+        "uv", "run", "--no-sync",
         "pytest",
         "--cov=.",
         "--cov-append",
@@ -149,6 +152,7 @@ def test_pydantic(session: nox.Session, gql_core: str) -> None:
         "pydantic",
         "--ignore=tests/cli",
         "--ignore=tests/benchmarks",
+        external=True,
     )
 
 
@@ -157,9 +161,10 @@ def test_pydantic(session: nox.Session, gql_core: str) -> None:
 def test_pydantic_v2(session: nox.Session, gql_core: str) -> None:
     session.run_always("uv", "sync", "--group", "dev", external=True)
 
-    session.install("pydantic>=2.2")
+    session.run("uv", "pip", "install", "pydantic>=2.2", external=True)
     _install_gql_core(session, gql_core)
     session.run(
+        "uv", "run", "--no-sync",
         "pytest",
         "--cov=.",
         "--cov-append",
@@ -168,6 +173,7 @@ def test_pydantic_v2(session: nox.Session, gql_core: str) -> None:
         "pydantic",
         "--ignore=tests/cli",
         "--ignore=tests/benchmarks",
+        external=True,
     )
 
 
@@ -175,18 +181,20 @@ def test_pydantic_v2(session: nox.Session, gql_core: str) -> None:
 def tests_typecheckers(session: nox.Session) -> None:
     session.run_always("uv", "sync", "--group", "dev", "--group", "integrations", external=True)
 
-    session.install("pyright")
-    session.install("pydantic")
-    session.install("mypy")
-    session.install("ty")
+    session.run("uv", "pip", "install", "pyright", external=True)
+    session.run("uv", "pip", "install", "pydantic", external=True)
+    session.run("uv", "pip", "install", "mypy", external=True)
+    session.run("uv", "pip", "install", "ty", external=True)
 
     session.run(
+        "uv", "run", "--no-sync",
         "pytest",
         "--cov=.",
         "--cov-append",
         "--cov-report=xml",
         "tests/typecheckers",
         "-vv",
+        external=True,
     )
 
 
@@ -194,14 +202,16 @@ def tests_typecheckers(session: nox.Session) -> None:
 def tests_cli(session: nox.Session) -> None:
     session.run_always("uv", "sync", "--group", "dev", external=True)
 
-    session.install("uvicorn")
-    session.install("starlette")
+    session.run("uv", "pip", "install", "uvicorn", external=True)
+    session.run("uv", "pip", "install", "starlette", external=True)
 
     session.run(
+        "uv", "run", "--no-sync",
         "pytest",
         "--cov=.",
         "--cov-append",
         "--cov-report=xml",
         "tests/cli",
         "-vv",
+        external=True,
     )
