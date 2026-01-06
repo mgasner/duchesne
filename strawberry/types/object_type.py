@@ -493,6 +493,22 @@ def interface(
     )
 
 
+def _asdict_inner(obj: Any) -> Any:
+    """Recursively convert an object to a dictionary-compatible structure."""
+    import msgspec
+    if hasattr(obj, "__struct_fields__"):
+        return {k: _asdict_inner(v) for k, v in msgspec.structs.asdict(obj).items()}
+    elif dataclasses.is_dataclass(obj) and not isinstance(obj, builtins.type):
+        return {f.name: _asdict_inner(getattr(obj, f.name)) for f in dataclasses.fields(obj)}
+    elif isinstance(obj, list):
+        return [_asdict_inner(v) for v in obj]
+    elif isinstance(obj, tuple):
+        return tuple(_asdict_inner(v) for v in obj)
+    elif isinstance(obj, dict):
+        return {k: _asdict_inner(v) for k, v in obj.items()}
+    return obj
+
+
 def asdict(obj: Any) -> dict[str, object]:
     """Convert a strawberry object into a dictionary.
 
@@ -518,10 +534,7 @@ def asdict(obj: Any) -> dict[str, object]:
     # {"name": "Lorem", "age": 25}
     ```
     """
-    import msgspec
-    if hasattr(obj, "__struct_fields__"):
-        return msgspec.structs.asdict(obj)
-    return dataclasses.asdict(obj)
+    return _asdict_inner(obj)
 
 
 __all__ = [
