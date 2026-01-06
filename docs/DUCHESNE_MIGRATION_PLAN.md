@@ -364,10 +364,12 @@ class ExecutionContext(msgspec.Struct):
 - Preserve `Generic[ContextType, RootValueType]` type parameters
 - Maintain `__class_getitem__` override for single type parameter support
 
-### Milestone 4.3: Migrate StrawberryObjectDefinition
+### Milestone 4.3: Migrate StrawberryObjectDefinition (DEFERRED)
 
 **Files to Modify:**
 - `strawberry/types/base.py`
+
+**Status:** DEFERRED - `StrawberryObjectDefinition` inherits from `StrawberryType` (ABC), creating a metaclass conflict with msgspec.Struct. Given its heavy usage throughout the codebase (21+ files), this migration requires careful planning and will be addressed in a future phase.
 
 **Special Handling Required:**
 - `eq=False` → msgspec equivalent
@@ -375,11 +377,39 @@ class ExecutionContext(msgspec.Struct):
 - `__post_init__` for Self annotation resolution
 
 ### Verification Criteria for Phase 4:
-- [ ] All existing tests pass
+- [x] All existing tests pass
 - [ ] Performance benchmarks show improvement (or at least no regression)
-- [ ] Generic type parameters work correctly
-- [ ] `__post_init__` equivalent behavior preserved
-- [ ] Memory usage reduced (msgspec uses `__slots__` by default)
+- [x] Generic type parameters work correctly
+- [x] `__post_init__` equivalent behavior preserved (via getter methods)
+- [x] Memory usage reduced (msgspec uses `__slots__` by default)
+
+**Phase 4 Status: PARTIALLY COMPLETE** (2026-01-06)
+
+**Types migrated to msgspec.Struct:**
+- `ExecutionContext` (execution.py) - with getter methods for optional fields
+- `ExecutionResult` (execution.py)
+- `PreExecutionError` (execution.py)
+- `Info` (info.py) - with `dict=True` for `cached_property` support
+
+**Key Implementation Details:**
+
+1. **ExecutionContext Migration:**
+   - Removed `InitVar` - `provided_operation_name` is now a regular field
+   - Fields with `default_factory` changed to `None` defaults with getter methods
+   - Added `get_parse_options()`, `get_validation_rules()`, `get_extensions_results()` methods
+   - `allowed_operations` changed from `Iterable` to `tuple` for immutability
+
+2. **Info Migration:**
+   - Uses `dict=True` to enable `__dict__` for `cached_property` support
+   - Preserves `Generic[ContextType, RootValueType]` type parameters
+   - Maintains custom `__class_getitem__` for single type parameter support
+
+3. **Extension Updates:**
+   - Updated extensions to use getter methods for optional fields
+   - `add_validation_rules.py`, `max_tokens.py`, `parser_cache.py`, `validation_cache.py`, `runner.py`
+
+**Deferred:**
+- `StrawberryObjectDefinition` - metaclass conflict with `StrawberryType` (ABC)
 
 ---
 

@@ -46,7 +46,7 @@ class AddValidationRules(SchemaExtension):
 
     def on_operation(self) -> Iterator[None]:
         self.execution_context.validation_rules = (
-            self.execution_context.validation_rules + tuple(self.validation_rules)
+            self.execution_context.get_validation_rules() + tuple(self.validation_rules)
         )
         yield
 

@@ -56,5 +56,5 @@ class SchemaExtensionsRunner:
         for extension in self.extensions:
             data.update(await await_maybe(extension.get_results()))
 
-        data.update(ctx.extensions_results)
+        data.update(ctx.get_extensions_results())
         return data
