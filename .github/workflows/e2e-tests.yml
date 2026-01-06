@@ -46,7 +46,7 @@ jobs:
       - name: Start Strawberry server
         run: |
           cd e2e
-          uv run --project .. strawberry dev app:schema --port 8000 &
+          uv run --no-sync --project .. strawberry dev app:schema --port 8000 &
           echo $! > server.pid
           sleep 5  # Wait for server to start
 

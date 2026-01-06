@@ -9,7 +9,7 @@ COPY pyproject.toml ./
 COPY uv.lock ./
 COPY README.md ./
 
-RUN uv sync --group dev
+RUN uv sync --group dev --extra cli
 
 COPY federation-compatibility/schema.py ./
 
